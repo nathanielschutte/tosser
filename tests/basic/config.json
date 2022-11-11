@@ -1,0 +1,27 @@
+{
+    "Database": {
+        "Connection": {
+            "Host": "localhost",
+            "Port": 3306,
+            "Username": "root",
+            "Password": "root",
+            "Database": "main"
+        }
+    },
+    "Defaults": {
+        "Schema": "data",
+        "RootTable": "core",
+        "Key": "{Table}_id"
+    },
+    "Tables": {
+        "core": {
+            "Key": "core"
+        },
+        "@include": [
+            "tables.d/*.table.json"
+        ]
+    },
+    "@include": [
+        "config.d/*.json"
+    ]
+}

@@ -1,0 +1,26 @@
+{
+    "users": {
+        "Source": [
+            "users",
+            "users/*/height",
+            "users/*/contact/*",
+            "users/*/extra/**"
+        ],
+        "Columns": {
+            "@include": "users.table.col.json"
+        }
+    },
+    "users_friends": {
+        "Source": [
+            "users/*/friends"
+        ],
+        "Columns": {
+            "@values": "first_name" 
+        }
+    },
+    "user_aliases": {
+        "Source": [
+            "users/aliases"
+        ]
+    }
+}

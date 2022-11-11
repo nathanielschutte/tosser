@@ -1,0 +1,4 @@
+*.exe
+.vscode
+dist
+src/*.egg-info
