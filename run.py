@@ -1,6 +1,15 @@
 
-from doc2sql import parser
+from pathlib import Path
 
-parser =
+from src.parsers.common import JsonParser
+from src.connections.BaseConnection import BaseConnection
+from src.context import Context
 
-ingest = Ingest()
+from src.ingest import Ingest
+
+parser = JsonParser()
+connection = BaseConnection()
+
+ingest = Ingest(parser=parser, connection=connection)
+
+ingest.generate_schema(input=Path('tests/basic/input/basic.data.json'), output=Path('tests/basic/output/schema.json'))
