@@ -1,4 +1,4 @@
-name: Test tosser package
+name: Tests and Analysis
 run-name: "Deploy to ${{ inputs.deploy_target }} by @${{ github.actor }}"
 
 on:
