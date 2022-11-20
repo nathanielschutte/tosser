@@ -1,0 +1,11 @@
+{
+  "ingest_log": {
+    "Source": [
+      "@meta"
+    ],
+    "Columns": {
+      "@remove": "",
+      "@keep": "*"
+    }
+  }
+}

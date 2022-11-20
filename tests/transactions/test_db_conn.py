@@ -10,7 +10,6 @@ def db_conn():
         host='localhost',
         user='nate',
         password='nate',
-        database='test_ingest',
         cursorclass=pymysql.cursors.DictCursor
     )
     with _conn as conn:

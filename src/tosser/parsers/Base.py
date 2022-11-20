@@ -1,4 +1,3 @@
-
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 import logging
@@ -6,10 +5,12 @@ import logging
 from pathlib import Path
 from typing import IO, Callable, Dict, Iterable, Iterator, Optional, Union, Any
 
+
 @dataclass
-class BaseObject():
+class BaseObject:
     data: dict
     complete: bool = False
+
 
 class BaseParser(ABC):
     def __init__(self) -> None:
@@ -23,7 +24,7 @@ class BaseParser(ABC):
     @abstractmethod
     def next_line(self, line, result):
         ...
-    
+
     def get_objects(self, path: Path, object: type = BaseObject) -> Iterable[BaseObject]:
         stream = self.get_stream(path)
         result = object()
