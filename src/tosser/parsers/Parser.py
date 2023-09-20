@@ -12,7 +12,7 @@ class BaseObject:
     complete: bool = False
 
 
-class BaseParser(ABC):
+class Parser(ABC):
     def __init__(self) -> None:
         self._log = logging.getLogger()
         self._has_stream = False
@@ -27,7 +27,7 @@ class BaseParser(ABC):
 
     def get_objects(self, path: Path, object: type = BaseObject) -> Iterable[BaseObject]:
         stream = self.get_stream(path)
-        result = object()
+        result = object(data={})
         for line in stream:
             line = line.strip('\n')
             self.next_line(line, result)

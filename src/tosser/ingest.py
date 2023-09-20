@@ -6,8 +6,8 @@ import logging.config
 from typing import List, Optional
 from pathlib import Path
 
-from tosser.parsers.Base import BaseParser, BaseObject
-from tosser.connections import BaseConn
+from tosser.parsers.Parser import Parser, BaseObject
+from tosser.connections import Connection
 from tosser.constants import IngestState
 from tosser.context import Context
 from tosser.map import Translator
@@ -19,13 +19,13 @@ class Ingest:
     
     def __init__(
         self, 
-        parser: BaseParser, 
-        connection: BaseConn
+        parser: Parser, 
+        connection: Connection
     ) -> None:
         logging.config.dictConfig(LOGGING_CONFIG)
 
-        self.parser: BaseParser = parser
-        self.conn: BaseConn = connection
+        self.parser: Parser = parser
+        self.conn: Connection = connection
 
         self.context: Context = Context()
         self.map: Translator = Translator()
@@ -45,12 +45,9 @@ class Ingest:
 
     def generate_schema(
         self,
-        input: Optional[Path] = None,
-        output: Optional[Path] = None
+        input: Path,
+        output: Path
     ) -> None:
-
-        if input is None or output is None:
-            raise IngestException('Must specify input and output files')
 
         # Start in the reading state
         self._update_state(IngestState.READING)

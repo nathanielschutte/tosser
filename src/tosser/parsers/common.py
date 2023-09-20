@@ -2,11 +2,11 @@ from typing import IO, Any, Iterable
 
 from pathlib import Path
 
-from tosser.parsers.Base import BaseParser
-from tosser.parsers.Base import BaseObject
+from tosser.parsers.Parser import Parser
+from tosser.parsers.Parser import BaseObject
 
 
-class FileParser(BaseParser):
+class FileParser(Parser):
     def __init__(self):
         super().__init__()
 

@@ -1,6 +1,6 @@
 from typing import List
 
-from tosser.connections.BaseConn import Connection
+from tosser.connections.Connection import Connection
 
 
 # Transactions should be committed per object

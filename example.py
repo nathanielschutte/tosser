@@ -1,14 +1,14 @@
 
 from pathlib import Path
 
-from src.parsers.common import JsonParser
-from src.connections.BaseConnection import BaseConnection
-from src.context import Context
+from tosser.parsers.common import JsonParser
+from tosser.connections.Connection import Connection
+from tosser.context import Context
 
-from src.ingest import Ingest
+from tosser.ingest import Ingest
 
 parser = JsonParser()
-connection = BaseConnection()
+connection = Connection()
 
 ingest = Ingest(parser=parser, connection=connection)
 

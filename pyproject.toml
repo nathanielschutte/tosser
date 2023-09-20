@@ -2,6 +2,23 @@
 requires = ["setuptools>=42.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
+[project]
+name = "tosser"
+version = "0.0.1"
+authors = [{name="Nate Schutte", email="natecodenew@gmail.com" }]
+description = "JSON to relational database ingester"
+readme = "README.md"
+dependencies = [
+    "requests>=2",
+    "pymysql>=1.0",
+    "typer>=0.9.0",
+    "rich>=13.5.3"
+]
+requires-python = ">=3.9"
+
+[project.scripts]
+toss = "tosser_cli:main"
+
 [tool.pytest.ini_options]
 addopts = "--cov=tosser"
 testpaths = [
