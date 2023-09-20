@@ -4,5 +4,17 @@
 Ingest objects into relational schema
 
 ## Install
-`pip install -r requirements/requirements_dev.txt`
+```
+pip install -r requirements/requirements_dev.txt
+pip install -e .
+```
 
+## CLI
+```
+toss --help
+```
+
+## Library
+```
+import tosser.*
+```
