@@ -6,6 +6,9 @@
 venv
 .venv
 
+# config
+.env
+
 # project
 _poetry_pyproject.toml
 run.py
