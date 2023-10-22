@@ -5,7 +5,7 @@ from tosser.endpoint.endpoint import IEndpoint, EndpointType
 
 class TargetDriver(Enum):
     DETAIL = 'detail'
-    MYSQL = 'mysql'
+    SQL = 'sql'
 
 class TargetCall(Enum):
     SETUP = 'setup'

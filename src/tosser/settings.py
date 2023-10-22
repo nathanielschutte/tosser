@@ -3,14 +3,14 @@
 
 import os
 import logging
-import enum
+from enum import Enum
 
 from pydantic import BaseSettings, BaseModel, Field, SecretStr, validator
 
 logger = logging.getLogger(__name__)
 
 
-class Environment(enum.Enum):
+class Environment(Enum):
     PRODUCTION = 'PRODUCTION'
     DEVELOPMENT = 'DEVELOPMENT'
 

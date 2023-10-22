@@ -6,3 +6,7 @@ rich==13.5.3
 Flask==3.0.0
 waitress==2.1.2
 python-dotenv==1.0.0
+pydantic==2.4.2
+pydantic_core==2.10.1
+databases==0.8.0
+SQLAlchemy==1.4.49

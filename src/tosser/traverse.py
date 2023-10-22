@@ -6,8 +6,7 @@ from dataclasses import dataclass
 from tosser.object import TosserObject
 from tosser.rules import TosserRuleSet, TosserRule
 
-
-class TraverserException(Exception):
+class TosserTraverserException(Exception):
     pass
 
 
@@ -57,20 +56,3 @@ class Traverser:
         yield from _inner_traverse(obj.data)
 
         return None
-
-
-if __name__ == '__main__':
-    assert os.environ.get('TOSSER_DEBUG') == 'true'
-
-    object_store = TosserObject()
-    object_store._quick_load(Path('tests/content/basic/0.data.json'))
-
-    tr_rules = TosserRuleSet()
-    tr_rules._demo_set()
-    # tr_rules._quick_load(Path('tests/configs/raw/basic/rules.json'))
-    
-    tr = Traverser(rules=tr_rules)
-    
-    for res in tr._traverse(object_store):
-        # print(res)
-        ...
