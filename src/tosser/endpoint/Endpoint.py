@@ -36,7 +36,7 @@ class IEndpoint:
             if self.config[k] != __value.config[k]:
                 return False
         return True
-    
+
     def resolve_config(self, config: str) -> Dict[str, Any]:
         if os.path.isfile(config):
             with open(config, 'r') as f:
@@ -54,3 +54,13 @@ class IEndpoint:
         except json.JSONDecodeError as e:
             self._log.error(f'Failed to parse JSON config string: {e}')
             raise e
+        
+    def get_endpoint_type(self) -> EndpointType:
+        if self.config.get('endpoint_type') == EndpointType.TARGET:
+            return EndpointType.TARGET
+        return EndpointType.SOURCE
+    
+    def get_endpoint_driver(self) -> Any:
+        if self.config.get('driver') is None:
+            return None
+        return self.config.get('driver')

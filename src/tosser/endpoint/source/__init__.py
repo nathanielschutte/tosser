@@ -1,12 +1,8 @@
-from enum import Enum
+from tosser.endpoint.source.source import ISource, SourceDriver
+from tosser.endpoint.source.file import FileSource
 
-from tosser.endpoint.endpoint import IEndpoint, EndpointType
+SOURCE_DRIVERS = {
+    'file': FileSource
+}
 
-class SourceDriver(Enum):
-    FILE = 'file'
-
-class ISource(IEndpoint):
-    def __init__(self, config: str) -> None:
-        super().__init__(config)
-
-        self.endpoint_type = EndpointType.SOURCE
+__all__ = ['ISource', 'SourceDriver', 'FileSource' 'SOURCE_DRIVERS']

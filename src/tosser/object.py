@@ -13,4 +13,6 @@ class TosserObject:
             self.data = json.loads(file.read())
 
     def __repr__(self) -> str:
-        return json.dumps(self.data, indent=4)
+        metadata = json.dumps(self.metadata, indent=4)
+        data = json.dumps(self.data, indent=4)
+        return f'<TosserObject metadata={metadata} data={data}>'

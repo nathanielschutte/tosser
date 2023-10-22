@@ -1,5 +1,5 @@
 from typing import List, Dict, Optional
-from tosser.endpoint.endpoint import Endpoint
+from tosser.endpoint.target import ITarget
 
 # Transactions should be committed per object
 # If any part of an object fails, rollback
@@ -18,7 +18,7 @@ class TransactionBatch:
 class Transactor:
     def __init__(self) -> None:
         self.batch: Dict[str, Optional[TransactionBatch]] = {}
-        self.endpoint: Endpoint
+        self.target: ITarget
 
     # Queue up rows to insert
     def enqueue(self, schema: str, table: str, rows: List[str]) -> None:

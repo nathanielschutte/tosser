@@ -1,14 +1,9 @@
-from enum import Enum
+from tosser.endpoint.target.target import ITarget, TargetDriver, TargetCall, TargetCallDynamic
+from tosser.endpoint.target.detail import DetailTarget
 
-from tosser.endpoint.endpoint import IEndpoint, EndpointType
+TARGET_DRIVERS = {
+    'detail': DetailTarget,
+    'mysql': None
+}
 
-class TargetDriver(Enum):
-    DETAIL = 'detail'
-    MYSQL = 'mysql'
-
-class ITarget(IEndpoint):
-    def __init__(self, config: str) -> None:
-        super().__init__(config)
-
-        self.endpoint_type = EndpointType.TARGET
-    
+__all__ = ['ITarget', 'TargetDriver', 'DetailTarget' 'TARGET_DRIVERS']

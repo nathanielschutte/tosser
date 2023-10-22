@@ -9,19 +9,19 @@ from tosser.constants import IngestState
 from tosser.context import Context
 from tosser.exceptions import IngestException
 from tosser.logs import LOG_MAIN, LOG_DEBUG
-from tosser.endpoint import Endpoint
-
+from tosser.endpoint.target import ITarget
+from tosser.endpoint.source import ISource
 
 class Ingest:
     def __init__(
         self, 
-        source: Endpoint,
-        target: Endpoint,
+        source: ISource,
+        target: ITarget,
     ) -> None:
         self.logger = logging.getLogger(LOG_DEBUG)
 
-        self.source: Endpoint = source
-        self.target: Endpoint = target
+        self.source = source
+        self.target = target
 
         self.context: Context = Context()
 
