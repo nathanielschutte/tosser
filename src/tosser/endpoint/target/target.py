@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Dict, Union, Any
 
 from tosser.endpoint.endpoint import IEndpoint, EndpointType
 
@@ -19,7 +20,7 @@ TARGET_CALLS = {t.name: t.value for t in TargetCall}
 TARGET_CALLS.update({t.name: t.value for t in TargetCallDynamic})
 
 class ITarget(IEndpoint):
-    def __init__(self, config: str) -> None:
+    def __init__(self, config: Union[str, Dict[str, Any]]) -> None:
         super().__init__(config)
 
         self.endpoint_type = EndpointType.TARGET

@@ -1,4 +1,5 @@
 {
     "endpoint_type": "source",
-    "type": "file"
+    "driver": "file",
+    "path": "test/content/*.json"
 }

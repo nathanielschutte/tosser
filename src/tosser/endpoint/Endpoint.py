@@ -12,12 +12,16 @@ class EndpointType(Enum):
     TARGET = 'target'
 
 class IEndpoint:
-    def __init__(self, config: str) -> None:
+    def __init__(self, config: Union[str, Dict[str, Any]]) -> None:
         self._log = logging.getLogger(LOG_DEBUG)
 
         self.endpoint_type = EndpointType.SOURCE
         self.driver: Any
-        self.config = self.resolve_config(config)
+
+        if isinstance(config, str):
+            self.config = self.resolve_config(config)
+        else:
+            self.config = config
     
     def __eq__(self, __value: object) -> bool:
         if not isinstance(__value, IEndpoint):

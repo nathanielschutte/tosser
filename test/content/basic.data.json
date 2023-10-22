@@ -1,47 +1,50 @@
 {
-    "users": {
-        "Nathaniel": {
-            "id": "1",
-            "first_name": "Nathaniel",
-            "last_name": "Schutte",
-            "height": 6,
-            "friends": [
-                {
-                    "first_name": "Joe",
-                    "last_name": "Mamma"
-                }
-            ],
-            "contact": {
-                "phone": "1234567890",
-                "family_members": [
+    "metadata": {},
+    "data": {
+        "users": {
+            "Nathaniel": {
+                "id": "1",
+                "first_name": "Nathaniel",
+                "last_name": "Schutte",
+                "height": 6,
+                "friends": [
                     {
-                        "first_name": "Maggie",
-                        "last_name": "Schutte"
+                        "first_name": "Joe",
+                        "last_name": "Mamma"
                     }
-                ]
-            },
-            "aliases": [
-                "Nate",
-                "Nathan"
-            ],
-            "extra": {
-                "colors": {
-                    "fav": "green"
+                ],
+                "contact": {
+                    "phone": "1234567890",
+                    "family_members": [
+                        {
+                            "first_name": "Maggie",
+                            "last_name": "Schutte"
+                        }
+                    ]
+                },
+                "aliases": [
+                    "Nate",
+                    "Nathan"
+                ],
+                "extra": {
+                    "colors": {
+                        "fav": "green"
+                    }
                 }
+            },
+            "Joe": {
+                "id": "2",
+                "height": 8
             }
         },
-        "Joe": {
-            "id": "2",
-            "height": 8
-        }
-    },
-    "space": {
-        "planets": {
-            "earth": {
-                "radius": 6371
-            },
-            "mars": {
-                "radius": 3390
+        "space": {
+            "planets": {
+                "earth": {
+                    "radius": 6371
+                },
+                "mars": {
+                    "radius": 3390
+                }
             }
         }
     }

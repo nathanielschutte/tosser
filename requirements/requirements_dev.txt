@@ -5,3 +5,5 @@ tox==3.24.3
 pytest==6.2.5
 pytest-cov==2.12.1
 mypy===0.910
+types-aiofiles==23.2.0.0
+types-waitress==2.1.4.9

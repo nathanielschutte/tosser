@@ -10,6 +10,9 @@ venv
 # config
 .env
 
+# workdir
+.workdir
+
 # project
 _poetry_pyproject.toml
 run.py

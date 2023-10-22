@@ -1,4 +1,4 @@
 {
     "endpoint_type": "target",
-    "driver": "mysql"
+    "driver": "detail"
 }

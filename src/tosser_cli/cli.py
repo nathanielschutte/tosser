@@ -5,6 +5,7 @@ from typing_extensions import Annotated
 from pathlib import Path
 from dotenv import load_dotenv
 from tosser.tosser import Tosser
+from tosser.endpoint.source.file import FileSource
 
 app = typer.Typer()
 tosser = Tosser()
@@ -14,6 +15,7 @@ tosser = Tosser()
 def generate(source: Annotated[str, typer.Option(help='Source endpoint config file or JSON')]):
     tosser.set_source(source)
     tosser.generate()
+
 
 @app.command()
 def test(schema: Annotated[str, typer.Argument()], output: Annotated[str, typer.Option()]):
@@ -53,6 +55,7 @@ def _open(
 @app.command(name='in')
 def _in():
     ...
+
 
 def main():
     load_dotenv()

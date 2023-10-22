@@ -1,7 +1,8 @@
 import logging
 
 LOG_DEBUG = 'debug'
-LOG_MAIN = 'main'
+LOG_MAIN = 'tosser'
+LOG_ENDPOINT = 'endpoint'
 
 LOGGING_CONFIG = {
     'version': 1,
@@ -26,6 +27,10 @@ LOGGING_CONFIG = {
             'handlers': ['console']
         },
         LOG_DEBUG: {
+            'level': logging.DEBUG,
+            'handlers': ['console']
+        },
+        LOG_ENDPOINT: {
             'level': logging.DEBUG,
             'handlers': ['console']
         }
