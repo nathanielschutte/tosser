@@ -1,2 +1,2 @@
 
-# Schema data structure. Handle 
+# Schema data structure.

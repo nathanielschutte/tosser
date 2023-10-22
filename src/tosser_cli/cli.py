@@ -4,18 +4,28 @@ from typing import Optional
 from typing_extensions import Annotated
 from pathlib import Path
 from dotenv import load_dotenv
+from tosser.tosser import Tosser
 
 app = typer.Typer()
+tosser = Tosser()
+
+
+@app.command()
+def generate(source: Annotated[str, typer.Argument(help='Source endpoint config file or JSON')]):
+    tosser.set_source(source)
+    tosser.set_target
 
 @app.command()
 def test(schema: Annotated[str, typer.Argument()], output: Annotated[str, typer.Option()]):
-    from tosser.ingest import Ingest
-    from tosser.parsers.common import JsonParser
-    from tosser.connections.Connection import Connection
-    parser = JsonParser()
-    connection = Connection()
-    ingest = Ingest(parser=parser, connection=connection)
-    ingest.generate_schema(Path(schema), Path(output))
+    # from tosser.ingest import Ingest
+    # from tosser.parsers.common import JsonParser
+    # from tosser.connections.Connection import Connection
+    # parser = JsonParser()
+    # connection = Connection()
+    # ingest = Ingest(parser=parser, connection=connection)
+    # ingest.generate_schema(Path(schema), Path(output))
+
+    ...
 
 
 @app.command(name='open')
@@ -30,14 +40,14 @@ def _open(
     if os.getenv('TOSS_BROWSER_ENV') in ['dev', 'development']:
         server_prod = False
 
-    from tosser_browser.browser import app
+    from tosser_browser.browser import app as flask_app
 
     if server_prod:
         from waitress import serve
         print('Starting production server...')
-        serve(app, host=host, port=port)
+        serve(flask_app, host=host, port=port)
     else:
-        app.run(debug=True, host=host, port=port)
+        flask_app.run(debug=True, host=host, port=port)
 
 
 @app.command(name='in')

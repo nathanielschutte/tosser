@@ -1,3 +1,6 @@
 
+class TosserException(Exception):
+    ...
+
 class IngestException(Exception):
     ...

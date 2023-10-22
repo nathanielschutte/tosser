@@ -2,8 +2,8 @@ from typing import IO, Any, Iterable
 
 from pathlib import Path
 
-from tosser.parsers.Parser import Parser
-from tosser.parsers.Parser import BaseObject
+from tosser.parsers.parser import Parser
+from tosser.parsers.parser import BaseObject
 
 
 class FileParser(Parser):

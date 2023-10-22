@@ -3,12 +3,12 @@ from dataclasses import dataclass
 import logging
 
 from pathlib import Path
-from typing import IO, Callable, Dict, Iterable, Iterator, Optional, Union, Any
+from typing import IO, Callable, Dict, Iterable, Iterator, Optional, Union, Any, Dict
 
 
 @dataclass
 class BaseObject:
-    data: dict
+    data: Dict[Any, Any]
     complete: bool = False
 
 

@@ -1,34 +1,29 @@
-
 import asyncio
 import logging
-import logging.config
 
 from typing import List, Optional
 from pathlib import Path
 
-from tosser.parsers.Parser import Parser, BaseObject
-from tosser.connections import Connection
+from tosser.parsers.parser import Parser, BaseObject
 from tosser.constants import IngestState
 from tosser.context import Context
-from tosser.map import Translator
 from tosser.exceptions import IngestException
-from tosser.logs import LOGGING_CONFIG, LOG_MAIN, LOG_DEBUG
+from tosser.logs import LOG_MAIN, LOG_DEBUG
+from tosser.endpoint import Endpoint
 
 
 class Ingest:
-    
     def __init__(
         self, 
-        parser: Parser, 
-        connection: Connection
+        source: Endpoint,
+        target: Endpoint,
     ) -> None:
-        logging.config.dictConfig(LOGGING_CONFIG)
+        self.logger = logging.getLogger(LOG_DEBUG)
 
-        self.parser: Parser = parser
-        self.conn: Connection = connection
+        self.source: Endpoint = source
+        self.target: Endpoint = target
 
         self.context: Context = Context()
-        self.map: Translator = Translator()
 
         self.state: IngestState = IngestState.IDLE
 
@@ -37,7 +32,7 @@ class Ingest:
         return logging.getLogger(LOG_DEBUG)
 
     def _update_state(self, new_state: IngestState):
-        Ingest._get_log().debug(f'State changed {self.state.value} -> {new_state.value}')
+        self.logger.debug(f'State changed {self.state.value} -> {new_state.value}')
         self.state = new_state
 
     def _traverse(self):
@@ -51,8 +46,3 @@ class Ingest:
 
         # Start in the reading state
         self._update_state(IngestState.READING)
-
-        # Get next object
-        for obj in self.parser.get_objects(path=input):
-            print(obj.data)
-        

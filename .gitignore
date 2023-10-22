@@ -5,6 +5,7 @@
 # virtual env
 venv
 .venv
+.venv*
 
 # config
 .env

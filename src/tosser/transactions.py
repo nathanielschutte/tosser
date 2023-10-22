@@ -1,7 +1,5 @@
-from typing import List
-
-from tosser.connections.Connection import Connection
-
+from typing import List, Dict, Optional
+from tosser.endpoint.endpoint import Endpoint
 
 # Transactions should be committed per object
 # If any part of an object fails, rollback
@@ -10,7 +8,7 @@ from tosser.connections.Connection import Connection
 # Queue
 class TransactionBatch:
     def __init__(self) -> None:
-        self.batch: list = []
+        self.batch: List[str] = []
 
     def enqueue(self, rows: List[str]):
         ...
@@ -18,10 +16,9 @@ class TransactionBatch:
 
 # Facilitate async batch uploads
 class Transactor:
-
     def __init__(self) -> None:
-        self.batch = {}
-        self._conn: Connection = Connection()
+        self.batch: Dict[str, Optional[TransactionBatch]] = {}
+        self.endpoint: Endpoint
 
     # Queue up rows to insert
     def enqueue(self, schema: str, table: str, rows: List[str]) -> None:
@@ -29,8 +26,7 @@ class Transactor:
         ...
 
         if schema not in self.batch:
-            self.batch[schema] = {}
+            self.batch[schema] = None
 
-        if table not in self.batch[schema]:
-            self.batch[schema][table] = TransactionBatch()
-    #
+        # if table not in self.batch[schema]:
+        #     self.batch[schema][table] = TransactionBatch()

@@ -1,0 +1,7 @@
+{
+    "flat": "*",
+    "flat2": "$.**",
+    "users": "$.users.*",
+    "users_deep": "$.users.**",
+    "friends": "$.users.*.friends[*].*"
+}
