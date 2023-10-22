@@ -4,7 +4,6 @@ import glob
 from typing import List
 from pathlib import Path
 
-from tosser.endpoint.endpoint import EndpointType
 from tosser.endpoint.source import ISource, SourceDriver
 from tosser.parsers.common import FileParser
 

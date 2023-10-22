@@ -13,7 +13,6 @@ tosser = Tosser()
 @app.command()
 def generate(source: Annotated[str, typer.Argument(help='Source endpoint config file or JSON')]):
     tosser.set_source(source)
-    tosser.set_target
 
 @app.command()
 def test(schema: Annotated[str, typer.Argument()], output: Annotated[str, typer.Option()]):
