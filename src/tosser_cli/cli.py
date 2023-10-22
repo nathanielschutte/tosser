@@ -4,8 +4,13 @@ from typing import Optional
 from typing_extensions import Annotated
 from pathlib import Path
 from dotenv import load_dotenv
+import logging
+
 from tosser import Tosser
 from tosser.endpoint.source.file import FileSource
+from tosser.logs import LOGGING_CONFIG
+
+logging.config.dictConfig(LOGGING_CONFIG)
 
 app = typer.Typer()
 tosser = Tosser()

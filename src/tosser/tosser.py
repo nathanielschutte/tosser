@@ -45,6 +45,8 @@ class Tosser:
         
 
     def generate(self) -> None:
+        """Generate schema """
+
         self.require_source('generate schema')
 
         objs = self.loop.run_until_complete(self.source.collect_objects())
