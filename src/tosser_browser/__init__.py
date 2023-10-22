@@ -1,3 +1,3 @@
-from tosser_browser.browser import app
+from tosser_browser.app import app
 
 __all__ = ['app']

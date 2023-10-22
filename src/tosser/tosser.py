@@ -24,8 +24,11 @@ class Tosser:
         
         self.is_setup = False
 
+        # Keeping the async loop in the main thread within context object
+        # Going to spawn thread pool to handle async compute tasks
         self.loop = asyncio.get_event_loop()
 
+        # Workspace setup
         self.work_dir: Path = Path('.')
         env_work_dir = os.getenv('TOSS_WORKDIR')
         if env_work_dir is not None:
@@ -38,17 +41,13 @@ class Tosser:
         if not self.is_setup:
             raise TosserException('Failed to set up Tosser')
         
+        self._set_work_dir_in_use()
+        
 
     def generate(self) -> None:
         self.require_source('generate schema')
 
-        async def _iter() -> List[TosserObject]:
-            objs = []
-            async for obj in self.source.iter_objects():
-                objs.append(obj)
-            return objs
-
-        objs = self.loop.run_until_complete(_iter())
+        objs = self.loop.run_until_complete(self.source.collect_objects())
         print(objs)
 
         schema = TosserSchema()
@@ -94,14 +93,19 @@ class Tosser:
 
     def require_source(self, reason: Optional[str] = None) -> None:
         if self.source is None:
-            raise TosserException(f'Source endpoint required reason: {reason}')
+            raise TosserException(f'Source endpoint required, reason: {reason}')
+        
+    
+    def require_target(self, reason: Optional[str] = None) -> None:
+        if self.target is None:
+            raise TosserException(f'Target endpoint required, reason: {reason}')
 
 
     def set_work_dir(self, path: Union[str, Path]) -> None:
         """Sets the tosser context working directory"""
 
         if self.is_setup and os.path.isdir(self.work_dir) and not self._work_dir_in_use():
-            os.rmdir(self.work_dir / '._tosser')
+            os.rmdir(self.work_dir / '.tosser')
         if isinstance(path, str):
             path = Path(path)
         self.work_dir = path
@@ -121,10 +125,10 @@ class Tosser:
     
 
     def _work_dir_in_use(self) -> bool:
-        return os.path.isfile(self.work_dir / '._tosser')
+        return os.path.isfile(self.work_dir / '.tosser')
 
 
     def _set_work_dir_in_use(self) -> None:
-        if not os.path.isfile(self.work_dir / '._tosser'):
-            with open(self.work_dir / '._tosser', 'w') as f:
+        if not os.path.isfile(self.work_dir / '.tosser'):
+            with open(self.work_dir / '.tosser', 'w') as f:
                 f.write('')

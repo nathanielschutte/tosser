@@ -26,7 +26,15 @@ class Traverser:
     def __init__(self, rules: Optional[TosserRuleSet] = None) -> None:
         self._rules: Optional[TosserRuleSet] = rules
 
-    def _traverse(self, obj: TosserObject, rules: Optional[TosserRuleSet] = None) -> Generator[TosserResult | None, None, None]:
+    def traverse(self, obj: TosserObject) -> Generator[Any, None, None]:
+        """Traverse the object and yield each value"""
+
+        ...
+
+
+    def traverse_and_capture(self, obj: TosserObject, rules: Optional[TosserRuleSet] = None) -> Generator[TosserResult | None, None, None]:
+        """Traverse the object and yield """
+
         if rules is not None:
             self._rules = rules
         assert self._rules is not None

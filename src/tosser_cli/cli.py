@@ -4,7 +4,7 @@ from typing import Optional
 from typing_extensions import Annotated
 from pathlib import Path
 from dotenv import load_dotenv
-from tosser.tosser import Tosser
+from tosser import Tosser
 from tosser.endpoint.source.file import FileSource
 
 app = typer.Typer()
@@ -39,10 +39,12 @@ def _open(
     server_prod = True
     if mode in ['dev', 'development']:
         server_prod = False
-    if os.getenv('TOSS_BROWSER_ENV') in ['dev', 'development']:
+    if os.getenv('TOSS_ENV') in ['dev', 'development']:
         server_prod = False
+    if os.getenv('FLASK_ENV') is None:
+        os.environ['FLASK_ENV'] = 'production' if server_prod else 'development'
 
-    from tosser_browser.browser import app as flask_app
+    from tosser_browser.app import app as flask_app
 
     if server_prod:
         from waitress import serve

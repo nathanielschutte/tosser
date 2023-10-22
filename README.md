@@ -4,34 +4,49 @@
 Ingest objects into relational schema
 
 ## Install
+Install requirements and package in a virtual env:
 ```bash
+python -m venv .venv
 pip install -r requirements/requirements.txt
 pip install -e .
 ```
+
+Copy `.env.example` to `.env` to configure behavior
 
 ## Browser
 Run a local Flask development server in debug mode
 ```bash
 toss open
-# runs on localhost:5000 by default, override with --port or -p
 ```
-**Production server should not be run with this command**
+
+Or run a production server
+```bash
+toss open --mode production
+```
+
+You can also run the flask app directly and configure Flask with environment variables or the `.env`
+```bash
+flask run
+```
+
+Flask app can be run programmatically by importing:
+```python
+from tosser_browser.browser import app as flask_app
+```
 
 ## CLI
-```bash
-toss --help
-```
-
 Synthesize source schema by specifying config location
 ```bash
-toss generate path/to/config.ini --output schema.toss
+toss generate
 ```
+Uses default map config path `config.ini` and outputs to schema file `schema.toss`
+
 
 Ingest file to a configured target
 ```bash
-toss in path/to/file.json --schema schema.toss --target mysql-endpoint.json
+toss in path/to/file.json --target mysql-endpoint.json
 
-# with
+# ex. with
 cat mysql-endpoint.json
 {
     "host": "localhost",
@@ -41,8 +56,9 @@ cat mysql-endpoint.json
     "database": "data"
 }
 
-# or pass endpoint config json directly to the --target option
+# or pass endpoint config JSON directly to the --target option
 ```
+Uses default schema file `schema.toss`
 
 Continuously ingest with
 ```bash
@@ -57,5 +73,6 @@ toss in --dynamic
 ## Library
 Import the tosser API
 ```python
-import tosser
+from tosser import Tosser
+tosser = Tosser()
 ```
