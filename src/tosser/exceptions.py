@@ -1,6 +1,9 @@
 
 class TosserException(Exception):
     ...
+    
+class TosserSchemaException(Exception):
+    ...
 
 class IngestException(Exception):
     ...

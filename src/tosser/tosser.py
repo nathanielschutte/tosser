@@ -29,13 +29,13 @@ class Tosser:
         self.loop = asyncio.get_event_loop()
 
         # Workspace setup
-        self.work_dir: Path = Path('.')
+        self._work_dir: Path = Path('.')
         env_work_dir = os.getenv('TOSS_WORKDIR')
         if env_work_dir is not None:
             self.set_work_dir(env_work_dir)
         if work_dir is not None:
             self.set_work_dir(work_dir)
-        self._log.debug(f'Using working directory: {self.work_dir}')
+        self._log.debug(f'Using working directory: {self._work_dir}')
 
         self.is_setup = self.setup()
         if not self.is_setup:
@@ -45,15 +45,20 @@ class Tosser:
         
 
     def generate(self) -> None:
-        """Generate schema """
+        """Generate schema using source objects"""
 
         self.require_source('generate schema')
 
-        objs = self.loop.run_until_complete(self.source.collect_objects())
-        print(objs)
-
         schema = TosserSchema()
-        schema.write_file(self.work_dir)
+        schema.begin()
+
+        async def _iter() -> None:
+            async for obj in self.source.iter_objects():
+                schema.contribute(obj)
+
+        self.loop.run_until_complete(_iter())
+        schema.end()
+        schema.write_file(self._work_dir)
         
 
     def set_source(self, endpoint: Union[endpoint_source.ISource, str]) -> None:
@@ -94,11 +99,15 @@ class Tosser:
 
 
     def require_source(self, reason: Optional[str] = None) -> None:
+        """Called to indicate that a configured ISource endpoint is required"""
+
         if self.source is None:
             raise TosserException(f'Source endpoint required, reason: {reason}')
         
     
     def require_target(self, reason: Optional[str] = None) -> None:
+        """Called to indicate that a configured ITarget endpoint is required"""
+
         if self.target is None:
             raise TosserException(f'Target endpoint required, reason: {reason}')
 
@@ -106,31 +115,31 @@ class Tosser:
     def set_work_dir(self, path: Union[str, Path]) -> None:
         """Sets the tosser context working directory"""
 
-        if self.is_setup and os.path.isdir(self.work_dir) and not self._work_dir_in_use():
-            os.rmdir(self.work_dir / '.tosser')
+        if self.is_setup and os.path.isdir(self._work_dir) and not self._work_dir_in_use():
+            os.rmdir(self._work_dir / '.tosser')
         if isinstance(path, str):
             path = Path(path)
-        self.work_dir = path
+        self._work_dir = path
 
 
     def setup(self) -> bool:
         """Called on tosser object instantiation, sets up filesystem"""
         
-        if not os.path.isdir(self.work_dir):
+        if not os.path.isdir(self._work_dir):
             try:
-                os.mkdir(self.work_dir)
+                os.mkdir(self._work_dir)
             except OSError as e:
-                self._log.error(f'Failed to create working directory \'{self.work_dir}\': {e}')
+                self._log.error(f'Failed to create working directory \'{self._work_dir}\': {e}')
                 return False
         
         return True
     
 
     def _work_dir_in_use(self) -> bool:
-        return os.path.isfile(self.work_dir / '.tosser')
+        return os.path.isfile(self._work_dir / '.tosser')
 
 
     def _set_work_dir_in_use(self) -> None:
-        if not os.path.isfile(self.work_dir / '.tosser'):
-            with open(self.work_dir / '.tosser', 'w') as f:
+        if not os.path.isfile(self._work_dir / '.tosser'):
+            with open(self._work_dir / '.tosser', 'w') as f:
                 f.write('')

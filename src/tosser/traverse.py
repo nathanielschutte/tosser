@@ -1,13 +1,31 @@
 import os
 from pathlib import Path
-from typing import Generator, List, Dict, Any, Optional, Iterable, Iterator, Union
+from typing import Generator, List, Dict, Any, Optional, Tuple, Iterator, Union
 from dataclasses import dataclass
+from enum import Enum
 
 from tosser.object import TosserObject
 from tosser.rules import TosserRuleSet, TosserRule
 
+
+ROOT_ID = '$'
+
+
 class TosserTraverserException(Exception):
     pass
+
+
+class TrailTokenType(Enum):
+    KEY = 'key'
+    INDEX = 'index'
+
+
+@dataclass
+class TrailToken:
+    """Traversal trail token is a value and a type"""
+
+    val: str | int
+    type: TrailTokenType
 
 
 @dataclass
@@ -26,10 +44,30 @@ class Traverser:
     def __init__(self, rules: Optional[TosserRuleSet] = None) -> None:
         self._rules: Optional[TosserRuleSet] = rules
 
-    def traverse(self, obj: TosserObject) -> Generator[Any, None, None]:
+
+    def traverse(self, obj: TosserObject) -> Generator[Tuple[List[TrailToken], str, Any], None, None]:
         """Traverse the object and yield each value"""
 
-        ...
+        data = obj.data
+
+        def _inner_traverse(_data: Any, trail: List[TrailToken]):
+            if isinstance(_data, dict):
+                for key, obj in _data.items():
+                    next_trail = trail.copy()
+                    next_trail.append(TrailToken(key, TrailTokenType.KEY))
+                    yield from _inner_traverse(obj, next_trail)
+            elif isinstance(_data, list):
+                for i, obj in enumerate(_data):
+                    next_trail = trail.copy()
+                    next_trail.append(TrailToken(i, TrailTokenType.INDEX))
+                    yield from _inner_traverse(obj, next_trail)
+            else:
+                yield (trail, trail[-1].val, _data)
+
+
+        yield from _inner_traverse(data, [TrailToken(ROOT_ID, TrailTokenType.KEY)])
+
+        return None
 
 
     def traverse_and_capture(self, obj: TosserObject, rules: Optional[TosserRuleSet] = None) -> Generator[TosserResult | None, None, None]:
@@ -41,7 +79,7 @@ class Traverser:
         rs: TosserRuleSet = self._rules
 
         root_context: bool = True
-        context_identifier: str = '$'
+        context_identifier: str = ROOT_ID
         context_trail: List[str] = []
         matched_rules_gen = rs._next_rules()
 
@@ -64,3 +102,10 @@ class Traverser:
         yield from _inner_traverse(obj.data)
 
         return None
+    
+    
+    @staticmethod
+    def get_trail_string(trail: List[TrailToken]) -> str:
+        """Return a string representation of the trail"""
+
+        return '.'.join(map(lambda t: str(t.val), trail))

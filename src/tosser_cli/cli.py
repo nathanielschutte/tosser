@@ -7,7 +7,6 @@ from dotenv import load_dotenv
 import logging
 
 from tosser import Tosser
-from tosser.endpoint.source.file import FileSource
 from tosser.logs import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
@@ -20,19 +19,6 @@ tosser = Tosser()
 def generate(source: Annotated[str, typer.Option(help='Source endpoint config file or JSON')]):
     tosser.set_source(source)
     tosser.generate()
-
-
-@app.command()
-def test(schema: Annotated[str, typer.Argument()], output: Annotated[str, typer.Option()]):
-    # from tosser.ingest import Ingest
-    # from tosser.parsers.common import JsonParser
-    # from tosser.connections.Connection import Connection
-    # parser = JsonParser()
-    # connection = Connection()
-    # ingest = Ingest(parser=parser, connection=connection)
-    # ingest.generate_schema(Path(schema), Path(output))
-
-    ...
 
 
 @app.command(name='open')
