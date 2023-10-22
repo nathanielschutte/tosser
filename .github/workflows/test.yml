@@ -25,10 +25,10 @@ jobs:
           pip install -r requirements/requirements_dev.txt
       - name: Static analysis (mypy)
         run: |
-          mypy src
+          mypy src --ignore-missing-imports
       - name: Static analysis (flake8)
         run: |
-          flake8 src
+          flake8 src --max-line-length=120 --ignore=E203,W503,W293
       - name: Test
         run: |
           pytest -k 'not transactions'

@@ -5,7 +5,7 @@ import os
 import logging
 from enum import Enum
 
-from pydantic import BaseSettings, BaseModel, Field, SecretStr, validator
+from pydantic import BaseModel, Field, SecretStr, validator
 
 logger = logging.getLogger(__name__)
 
@@ -15,13 +15,13 @@ class Environment(Enum):
     DEVELOPMENT = 'DEVELOPMENT'
 
 
-class Credentials(BaseSettings):
+class Credentials(BaseModel):
     """Secret configuration"""
     host = 'localhost'
     
 
 
-class Configuration(BaseSettings):
+class Configuration(BaseModel):
     """Nonsensitive configuration"""
     
     env: Environment = Environment.DEVELOPMENT
@@ -39,4 +39,3 @@ class Configuration(BaseSettings):
 class Settings(BaseModel):
     creds: Credentials = Field(default_factory=lambda: Credentials())
     config: Configuration = Field(default_factory=lambda: Configuration())
-
