@@ -27,7 +27,10 @@ class FileSource(ISource):
         for file in self.file_list:
             async with aiofiles.open(file, 'r') as f:
                 contents = await f.read()
+
+            # TODO switch to using a FileParser here
             parsed = json.loads(contents)
+
             self.check_keys(parsed)
             yield TosserObject(data=parsed['data'], metadata=parsed['metadata'])
 

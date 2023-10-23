@@ -1,15 +1,27 @@
 import json
-from typing import Dict, Any
+from typing import Dict, Any, List
 from pathlib import Path
 import logging
+import dataclasses
 
 from tosser.logs import LOG_MAIN
 from tosser.exceptions import TosserSchemaException
 from tosser.object import TosserObject
 from tosser.traverse import Traverser
+from tosser.schema_types import TosserSchemaTypeVar
 
 SCHEMA_FILE_EXT = 'toss'
 SCHEMA_DEFAULT_FILE_NAME = 'schema'
+
+
+@dataclasses.dataclass()
+class TosserSchemaColumn:
+    table_name: str
+    column_name: str
+    type_var: TosserSchemaTypeVar
+    enum: List[Any]
+    max_length: int
+
 
 class TosserSchema:
     """Tosser schema data structure"""
@@ -18,8 +30,8 @@ class TosserSchema:
         self._log = logging.getLogger(LOG_MAIN)
 
         self.complete = True
-        self.filename = f'{SCHEMA_DEFAULT_FILE_NAME}.{SCHEMA_FILE_EXT}'
-        self.schema: Dict[str, Any] = {}
+        self.filename = TosserSchema.default_file_string()
+        self.schema: Dict[str, List[TosserSchemaColumn]] = {}
 
         self._generating = False
         self._gen_n = 0
@@ -51,7 +63,6 @@ class TosserSchema:
         self._gen_n += 1
         
 
-
     def end(self) -> None:
         """End new schema generation"""
 
@@ -66,7 +77,24 @@ class TosserSchema:
 
     def load_file(self) -> None:
         """Load schema from file"""
-        ...
+        
+        self._log.info(f'Loading schema from file: {self.filename}')
+        with open(self.filename, 'r') as f:
+            data = json.load(f)
+        
+        self.schema = {
+            table_name: [
+                TosserSchemaColumn(
+                    table_name=table_name,
+                    column_name=column_name,
+                    type_var=TosserSchemaTypeVar.from_string(type_string),
+                    enum=enum,
+                    max_length=max_length,
+                )
+                for column_name, (type_string, enum, max_length) in columns.items()
+            ]
+            for table_name, columns in data.items()
+        }
 
 
     def write_file(self, work_dir: Path) -> None:
@@ -79,4 +107,13 @@ class TosserSchema:
 
 
     def _render(self) -> str:
-        return json.dumps(self.schema)
+        data = {
+            table_name: columns
+            for table_name, columns in self.schema.items()
+        }
+        return json.dumps(data, indent=4)
+
+
+    @staticmethod
+    def default_file_string() -> str:
+        return f'{SCHEMA_DEFAULT_FILE_NAME}.{SCHEMA_FILE_EXT}'

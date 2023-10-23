@@ -1,0 +1,51 @@
+{
+    "Defaults": {
+        "Schema": "data",
+        "RootTable": "core",
+        "Key": "{table}_id"
+    },
+    "Tables": {
+        "core": {
+            "Key": "core"
+        },
+        "users": {
+            "Source": [
+                "users",
+                "users/*/height",
+                "users/*/contact/*",
+                "users/*/extra/**"
+            ],
+            "Columns": {
+                "height": {
+                    "Name": "Height",
+                    "Type": "integer"
+                }
+            }
+        },
+        "users_friends": {
+            "Source": [
+                "users/*/friends"
+            ],
+            "Columns": {
+                "@values": "first_name"
+            }
+        },
+        "user_aliases": {
+            "Source": [
+                "users/aliases"
+            ]
+        },
+        "ingest_log": {
+            "Source": [
+                "@meta"
+            ],
+            "Columns": {
+                "@remove": "",
+                "@keep": "*"
+            }
+        }
+    },
+    "Translate": {
+        "something": "nothing"
+    }
+}

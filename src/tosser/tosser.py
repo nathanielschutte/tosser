@@ -1,5 +1,6 @@
 import os
-from typing import Optional, Union, List
+import json
+from typing import Optional, Union, Dict, Any, TypeAlias
 from pathlib import Path
 import logging
 from dotenv import load_dotenv
@@ -11,12 +12,20 @@ import tosser.endpoint.source as endpoint_source
 import tosser.endpoint.target as endpoint_target 
 from tosser.schema import TosserSchema
 from tosser.object import TosserObject
-
+from tosser.map import TosserMap
+from tosser.types import TossPathT
+from tosser.util import *
+from tosser.configd import ConfigExtender
 
 class Tosser:
     """Context object for tosser operations"""
 
-    def __init__(self, work_dir: Optional[Union[str, Path]] = None) -> None:
+    def __init__(
+            self, 
+            work_dir: TossPathT = None,
+            map_file: TossPathT = None,
+            config_file: TossPathT = None,
+        ) -> None:
         load_dotenv()
         
         self._log = logging.getLogger(LOG_MAIN)
@@ -28,16 +37,20 @@ class Tosser:
         # Going to spawn thread pool to handle async compute tasks
         self.loop = asyncio.get_event_loop()
 
+        # Context
+        self.map_file: Path
+        self.config_file: Path
+        self.map: Optional[TosserMap] = None
+        self.config: Optional[Dict[str, Any]] = None
+
         # Workspace setup
         self._work_dir: Path = Path('.')
-        env_work_dir = os.getenv('TOSS_WORKDIR')
-        if env_work_dir is not None:
-            self.set_work_dir(env_work_dir)
-        if work_dir is not None:
-            self.set_work_dir(work_dir)
-        self._log.debug(f'Using working directory: {self._work_dir}')
 
-        self.is_setup = self.setup()
+        self.is_setup = self.setup(
+            work_dir=work_dir,
+            map_file=map_file,
+            config_file=config_file,
+        )
         if not self.is_setup:
             raise TosserException('Failed to set up Tosser')
         
@@ -117,14 +130,45 @@ class Tosser:
 
         if self.is_setup and os.path.isdir(self._work_dir) and not self._work_dir_in_use():
             os.rmdir(self._work_dir / '.tosser')
-        if isinstance(path, str):
-            path = Path(path)
+        path = resolve_path_ref(path)
         self._work_dir = path
 
 
-    def setup(self) -> bool:
-        """Called on tosser object instantiation, sets up filesystem"""
+    def reload_map(self) -> None:
+        if not self.map_file:
+            raise TosserException('Cannot reload map before setting map file')
+        ext = ConfigExtender(self.map_file, json.load)
+        self.map = TosserMap.from_dict(ext.render())
+
         
+    def reload_config(self) -> None:
+        if not self.config_file:
+            raise TosserException('Cannot reload config before setting config file')
+        with open(self.config_file, 'r') as f:
+            self.config = json.load(f)
+
+
+    def setup(
+            self, 
+            work_dir: TossPathT = None,
+            map_file: TossPathT = None,
+            config_file: TossPathT = None,
+        ) -> bool:
+        """Called on tosser object instantiation, sets up filesystem"""
+
+        # Working directory
+        self.set_work_dir(resolve_config('TOSS_WORKDIR', work_dir, '.'))
+        self._log.debug(f'Using working directory: {self._work_dir}')
+
+        # Map config
+        map_file = resolve_config('TOSS_SCHEMA_MAP', map_file, TosserSchema.default_file_string())
+        self.map_file = resolve_path_ref(map_file)
+        self.reload_map()
+
+        # Ingest config
+        config_file = resolve_config('TOSS_CONFIG_FILE', config_file, 'config.json')
+        self.config_file = resolve_path_ref(config_file)
+
         if not os.path.isdir(self._work_dir):
             try:
                 os.mkdir(self._work_dir)

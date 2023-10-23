@@ -2,7 +2,7 @@
     "Defaults": {
         "Schema": "data",
         "RootTable": "core",
-        "Key": "{Table}_id"
+        "Key": "{table}_id"
     },
     "Tables": {
         "core": {
