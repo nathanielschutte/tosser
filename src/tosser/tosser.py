@@ -1,6 +1,6 @@
 import os
 import json
-from typing import Optional, Union, Dict, Any, TypeAlias
+from typing import Optional, Union, Dict, Any
 from pathlib import Path
 import logging
 from dotenv import load_dotenv
@@ -24,6 +24,7 @@ class Tosser:
             work_dir: TossPathT = None,
             map_file: TossPathT = None,
             config_file: TossPathT = None,
+            schema_file: TossPathT = None,
         ) -> None:
         load_dotenv()
         
@@ -37,8 +38,10 @@ class Tosser:
         self.loop = asyncio.get_event_loop()
 
         # Context
+        self.schema_file: Path
         self.map_file: Path
         self.config_file: Path
+        self.schema: Optional[TosserSchema] = None
         self.map: Optional[TosserMap] = None
         self.config: Optional[Dict[str, Any]] = None
 
@@ -47,6 +50,7 @@ class Tosser:
 
         self.is_setup = self.setup(
             work_dir=work_dir,
+            schema_file=schema_file,
             map_file=map_file,
             config_file=config_file,
         )
@@ -54,6 +58,23 @@ class Tosser:
             raise TosserException('Failed to set up Tosser')
         
         self._set_work_dir_in_use()
+
+    
+    # DECORATORS
+    def _with_schema(func: Any) -> Any:
+        def wrapper(*args):
+            self = args[0]
+            self.reload_schema()
+            return func(*args)
+        return wrapper
+
+
+    # API
+    @_with_schema
+    def ingest(self):
+        """Ingest objects"""
+
+        print()
         
 
     def generate(self) -> None:
@@ -133,7 +154,18 @@ class Tosser:
         self._work_dir = path
 
 
+    def reload_schema(self) -> None:
+        """Recreates the TosserSchema object using the configured schema_file"""
+
+        if not self.schema_file:
+            raise TosserException('Cannot reload schema before setting schema file')
+        self.schema = TosserSchema(path=self.schema_file)
+        self.schema.load_file()
+
+
     def reload_map(self) -> None:
+        """Recreates the TosserMap object using the configured map_file"""
+
         if not self.map_file:
             raise TosserException('Cannot reload map before setting map file')
         ext = ConfigExtender(self.map_file, json.load)
@@ -141,6 +173,8 @@ class Tosser:
 
         
     def reload_config(self) -> None:
+        """Recreates the base config dictionary using the configured config_file"""
+
         if not self.config_file:
             raise TosserException('Cannot reload config before setting config file')
         with open(self.config_file, 'r') as f:
@@ -150,23 +184,56 @@ class Tosser:
     def setup(
             self, 
             work_dir: TossPathT = None,
+            schema_file: TossPathT = None,
             map_file: TossPathT = None,
             config_file: TossPathT = None,
         ) -> bool:
-        """Called on tosser object instantiation, sets up filesystem"""
+        """Called on Tosser object instantiation, sets up filesystem"""
 
         # Working directory
         self.set_work_dir(resolve_config('TOSS_WORKDIR', work_dir, '.'))
         self._log.debug(f'Using working directory: {self._work_dir}')
 
+        # TODO make routine for path checks that should be in the workdir
+
+        # Schema config
+        schema_file = resolve_config('TOSS_GENERATED_SCHEMA_FILE', schema_file, TosserSchema.default_file_string())
+        try_schema_file = resolve_path_ref(schema_file, check=False)
+        if try_schema_file is not None:
+            if not try_schema_file.is_absolute():
+                self.schema_file = self._work_dir / try_schema_file
+            else:
+                self.schema_file = try_schema_file
+            self._log.debug(f'Using schema file: {self.schema_file}')
+            self.reload_schema()
+        else:
+            self._log.debug('No existing schema file')
+
         # Map config
-        map_file = resolve_config('TOSS_SCHEMA_MAP', map_file, TosserSchema.default_file_string())
-        self.map_file = resolve_path_ref(map_file)
-        self.reload_map()
+        map_file = resolve_config('TOSS_SCHEMA_MAP', map_file, 'map.tosser.json')
+        try_map_file = resolve_path_ref(map_file)
+        if try_map_file is not None:
+            if not try_map_file.is_absolute():
+                self.map_file = self._work_dir / try_map_file
+            else:
+                self.map_file = try_map_file
+            self._log.debug(f'Using map file: {self.map_file}')
+            self.reload_map()
+        else:
+            self._log.error(f'Map file not found: {map_file}')
+            return False
 
         # Ingest config
-        config_file = resolve_config('TOSS_CONFIG_FILE', config_file, 'config.json')
-        self.config_file = resolve_path_ref(config_file)
+        config_file = resolve_config('TOSS_CONFIG_FILE', config_file, 'config.tosser.json')
+        try_config_file = resolve_path_ref(config_file)
+        if try_config_file is not None:
+            if not try_config_file.is_absolute():
+                self.config_file = self._work_dir / try_config_file
+            else:
+                self.config_file = try_config_file
+            self._log.debug(f'Using config file: {self.config_file}')
+        else:
+            self._log.error(f'Config file not found: {config_file}')
 
         if not os.path.isdir(self._work_dir):
             try:
@@ -178,6 +245,7 @@ class Tosser:
         return True
     
 
+    # INTERNAL
     def _work_dir_in_use(self) -> bool:
         return os.path.isfile(self._work_dir / '.tosser')
 

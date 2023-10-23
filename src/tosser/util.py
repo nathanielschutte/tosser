@@ -17,13 +17,15 @@ def resolve_config(env_var: str, val: Any, default: Any) -> Any:
     return default
 
 
-def resolve_path_ref(path: TossPathT, check: bool = True) -> Path:
+def resolve_path_ref(path: TossPathT, check: bool = True) -> Optional[Path]:
     """Resolve a TossPathT to a Path object"""
 
     if path is None:
         raise TosserException('Cannot resolve path ref that is None')
     if check and not os.path.exists(path):
         raise TosserException(f'Path does not exist: {str(path)}')
+    if not os.path.exists(path):
+        return None
     if isinstance(path, str):
         return Path(path)
     return path

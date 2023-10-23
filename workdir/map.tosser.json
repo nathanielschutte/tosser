@@ -1,0 +1,7 @@
+{
+    "Defaults": {
+        "Schema": "data",
+        "RootTable": "root",
+        "Key": "{table}_id"
+    }
+}

@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Any, List
+from typing import Dict, Any, List, Optional
 from pathlib import Path
 import logging
 import dataclasses
@@ -9,6 +9,7 @@ from tosser.exceptions import TosserSchemaException
 from tosser.object import TosserObject
 from tosser.traverse import Traverser
 from tosser.schema_types import TosserSchemaTypeVar
+from tosser.types import TossPathT
 
 SCHEMA_FILE_EXT = 'toss'
 SCHEMA_DEFAULT_FILE_NAME = 'schema'
@@ -26,7 +27,7 @@ class TosserSchemaColumn:
 class TosserSchema:
     """Tosser schema data structure"""
     
-    def __init__(self) -> None:
+    def __init__(self, path: Optional[TossPathT] = None) -> None:
         self._log = logging.getLogger(LOG_MAIN)
 
         self.complete = True
