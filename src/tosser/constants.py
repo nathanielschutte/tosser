@@ -1,7 +1,5 @@
 from enum import Enum
 
-
-
 class IngestState(Enum):
     IDLE = 'idle' # before run
 

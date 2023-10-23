@@ -1,32 +1,42 @@
 from typing import List, Dict, Optional
+import dataclasses
+from enum import Enum
+
 from tosser.endpoint.target import ITarget
 
-# Transactions should be committed per object
-# If any part of an object fails, rollback
+
+class TransactionType(Enum):
+    CREATE_TABLE = 'create_table'
+    INSERT = 'insert'
+    BATCH_INSERT = 'batch_insert'
+    ALTER_COLUMN = 'alter_column'
+    ADD_COLUMN = 'add_column'
 
 
-# Queue
-class TransactionBatch:
-    def __init__(self) -> None:
-        self.batch: List[str] = []
-
-    def enqueue(self, rows: List[str]):
-        ...
+@dataclasses.dataclass
+class Transaction:
+    type: TransactionType
+    query: str
 
 
-# Facilitate async batch uploads
+class TransactionBatch(Transaction):
+    batch: List[Transaction]
+    type = TransactionType.BATCH_INSERT
+
+    def add(self, transaction: Transaction) -> None:
+        self.batch.append(transaction)
+
+    def __len__(self) -> int:
+        return len(self.batch)
+
+
 class Transactor:
     def __init__(self) -> None:
-        self.batch: Dict[str, Optional[TransactionBatch]] = {}
+        self.queue: List[Transaction]
         self.target: ITarget
 
-    # Queue up rows to insert
-    def enqueue(self, schema: str, table: str, rows: List[str]) -> None:
-        """Queue up rows to insert for a table"""
-        ...
 
-        if schema not in self.batch:
-            self.batch[schema] = None
-
-        # if table not in self.batch[schema]:
-        #     self.batch[schema][table] = TransactionBatch()
+    def enqueue(self, transaction: Transaction) -> None:
+        """Queue a Transaction"""
+        
+        self.queue.append(transaction)

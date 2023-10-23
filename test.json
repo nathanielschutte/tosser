@@ -40,8 +40,8 @@
                 "@meta"
             ],
             "Columns": {
-                "@remove": "",
-                "@keep": "*"
+                "@include": "*",
+                "@exclude": ""
             }
         }
     },

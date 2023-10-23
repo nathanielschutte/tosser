@@ -57,7 +57,7 @@ class TosserSchema:
         tr = Traverser(rules=None)
         for trail, key, value in tr.traverse(obj):
             assert trail[-1].val == key
-            print(f'{Traverser.get_trail_string(trail)} = {value}')
+            # print(f'{Traverser.get_trail_string(trail)} = {value}')
         
         self._log.debug(f'Contributed object [{self._gen_n}] to new schema')
         self._gen_n += 1

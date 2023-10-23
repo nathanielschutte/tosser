@@ -6,7 +6,6 @@ from pathlib import Path
 
 from tosser.parsers.parser import Parser, BaseObject
 from tosser.constants import IngestState
-from tosser.context import Context
 from tosser.exceptions import IngestException
 from tosser.logs import LOG_MAIN, LOG_DEBUG
 from tosser.endpoint.target import ITarget
@@ -22,8 +21,6 @@ class Ingest:
 
         self.source = source
         self.target = target
-
-        self.context: Context = Context()
 
         self.state: IngestState = IngestState.IDLE
 

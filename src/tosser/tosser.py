@@ -11,7 +11,6 @@ from tosser.exceptions import TosserException
 import tosser.endpoint.source as endpoint_source
 import tosser.endpoint.target as endpoint_target 
 from tosser.schema import TosserSchema
-from tosser.object import TosserObject
 from tosser.map import TosserMap
 from tosser.types import TossPathT
 from tosser.util import *

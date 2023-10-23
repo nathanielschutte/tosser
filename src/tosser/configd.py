@@ -8,6 +8,8 @@ from tosser.logs import LOG_MAIN
 from tosser.types import TossPathT
 from tosser.util import *
 
+# TODO turn this into an external python package. seems useful.
+
 class ConfigExtender:
     """Builds a complete dict object from a config file with glob extensions"""
 
@@ -22,32 +24,35 @@ class ConfigExtender:
         self.path = resolve_path_ref(path)
         self.loader = loader
         self.include_keyword = include_keyword
-
-    def _read(self, path: Path) -> Dict[str, Any]:
-        with open(path, 'r') as f:
-            return self.loader(f)
         
     def render(self) -> Dict[str, Any]:
         """Recursively loads included files and combines them into a single dict"""
 
+        # Member routine A: traverse a JSON object seeking the 'include' keyword
         def _traverse(obj: Any, trail: List[str]) -> Optional[List[Tuple[List[str], List[str]]]]:
             # print(obj, trail)
             result = []
+
+            # 'include' can be a single string glob or a list of globs
             if len(trail) > 0 and trail[-1] == self.include_keyword:
                 if isinstance(obj, str):
                     result = [(trail, [obj])]
                 elif isinstance(obj, list):
                     result = [(trail, obj)]
+
             if isinstance(obj, dict):
                 for k, v in obj.items():
                     next_trail = trail.copy()
                     next_trail.append(k)
                     next_result = _traverse(v, next_trail)
+
                     if next_result is not None:
                         result.extend(next_result)
+
             return result
 
-
+        # Member routine B: recursively load included files using the globs found in A
+        # and the specified IO loader function
         def _include(path: Path) -> Dict[str, Any]:
             next_data = self._read(path)
             seek_keywords = _traverse(next_data, [])
@@ -55,7 +60,7 @@ class ConfigExtender:
             if seek_keywords is None or len(seek_keywords) == 0:
                 return next_data
             
-            print(f'{os.path.basename(path)}: found keywords: {seek_keywords}')
+            # print(f'{os.path.basename(path)}: found keywords: {seek_keywords}')
 
             for seek_path, seek_globs in seek_keywords:
                 if len(seek_globs) < 1:
@@ -88,3 +93,7 @@ class ConfigExtender:
             return next_data
 
         return _include(self.path)
+
+    def _read(self, path: Path) -> Dict[str, Any]:
+        with open(path, 'r') as f:
+            return self.loader(f)
