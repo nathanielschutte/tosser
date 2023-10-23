@@ -5,7 +5,7 @@ from pathlib import Path
 from tosser.types import TossPathT
 from tosser.exceptions import TosserException
 
-def resolve_config(env_var: str, val: Any, default: Any) -> Any:
+def resolve_config(env_var: str, val: Any, default: Any, allow_empty_env: bool = False) -> Any:
     """Resolve a configuration value using passed value, environment variable, and default"""
 
     # (default -> env -> arg)
@@ -13,19 +13,18 @@ def resolve_config(env_var: str, val: Any, default: Any) -> Any:
         return val
     test_env = os.getenv(env_var)
     if test_env is not None:
-        return test_env
+        if len(test_env) > 0 or allow_empty_env:
+            return test_env
     return default
 
 
-def resolve_path_ref(path: TossPathT, check: bool = True) -> Optional[Path]:
+def resolve_path_ref(path: TossPathT, check: bool = True) -> Path:
     """Resolve a TossPathT to a Path object"""
 
     if path is None:
         raise TosserException('Cannot resolve path ref that is None')
     if check and not os.path.exists(path):
         raise TosserException(f'Path does not exist: {str(path)}')
-    if not os.path.exists(path):
-        return None
     if isinstance(path, str):
         return Path(path)
     return path
@@ -51,4 +50,3 @@ def get_field(
         if not optional:
             raise TosserException(f'Field not found: {field}')
         return default
-    

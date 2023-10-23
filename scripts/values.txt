@@ -1,0 +1,12 @@
+red
+green
+blue
+Nate
+Liana
+ten
+hungry
+none
+AP Calclus
+AP Physics
+True
+false

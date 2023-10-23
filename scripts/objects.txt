@@ -1,0 +1,17 @@
+people
+places
+friends
+siblings
+jobs
+hobbies
+users
+workers
+employers
+employees
+members
+tasks
+students
+teachers
+professors
+classes
+courses

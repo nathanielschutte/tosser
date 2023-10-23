@@ -13,6 +13,7 @@ venv
 
 # workdir
 .workdir
+.data
 
 # logs
 *.log

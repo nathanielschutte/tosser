@@ -1,3 +1,4 @@
+import os
 import json
 from typing import Dict, Any, List, Optional
 from pathlib import Path
@@ -10,6 +11,7 @@ from tosser.object import TosserObject
 from tosser.traverse import Traverser
 from tosser.schema_types import TosserSchemaTypeVar
 from tosser.types import TossPathT
+from tosser.util import resolve_path_ref
 
 SCHEMA_FILE_EXT = 'toss'
 SCHEMA_DEFAULT_FILE_NAME = 'schema'
@@ -32,6 +34,10 @@ class TosserSchema:
 
         self.complete = True
         self.filename = TosserSchema.default_file_string()
+        self.path = Path(self.filename)
+        if path is not None:
+            self.path = resolve_path_ref(path)
+            self.filename = os.path.basename(self.path)
         self.schema: Dict[str, List[TosserSchemaColumn]] = {}
 
         self._generating = False
@@ -80,7 +86,7 @@ class TosserSchema:
         """Load schema from file"""
         
         self._log.info(f'Loading schema from file: {self.filename}')
-        with open(self.filename, 'r') as f:
+        with open(self.path, 'r') as f:
             data = json.load(f)
         
         self.schema = {

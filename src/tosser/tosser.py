@@ -199,11 +199,11 @@ class Tosser:
         # Schema config
         schema_file = resolve_config('TOSS_GENERATED_SCHEMA_FILE', schema_file, TosserSchema.default_file_string())
         try_schema_file = resolve_path_ref(schema_file, check=False)
-        if try_schema_file is not None:
-            if not try_schema_file.is_absolute():
-                self.schema_file = self._work_dir / try_schema_file
-            else:
-                self.schema_file = try_schema_file
+        if not try_schema_file.is_absolute():
+            self.schema_file = self._work_dir / try_schema_file
+        else:
+            self.schema_file = try_schema_file
+        if self.schema_file.exists():
             self._log.debug(f'Using schema file: {self.schema_file}')
             self.reload_schema()
         else:
@@ -211,12 +211,12 @@ class Tosser:
 
         # Map config
         map_file = resolve_config('TOSS_SCHEMA_MAP', map_file, 'map.tosser.json')
-        try_map_file = resolve_path_ref(map_file)
-        if try_map_file is not None:
-            if not try_map_file.is_absolute():
-                self.map_file = self._work_dir / try_map_file
-            else:
-                self.map_file = try_map_file
+        try_map_file = resolve_path_ref(map_file, check=False)
+        if not try_map_file.is_absolute():
+            self.map_file = self._work_dir / try_map_file
+        else:
+            self.map_file = try_map_file
+        if self.map_file.exists():
             self._log.debug(f'Using map file: {self.map_file}')
             self.reload_map()
         else:
@@ -225,15 +225,16 @@ class Tosser:
 
         # Ingest config
         config_file = resolve_config('TOSS_CONFIG_FILE', config_file, 'config.tosser.json')
-        try_config_file = resolve_path_ref(config_file)
-        if try_config_file is not None:
-            if not try_config_file.is_absolute():
-                self.config_file = self._work_dir / try_config_file
-            else:
-                self.config_file = try_config_file
+        try_config_file = resolve_path_ref(config_file, check=False)
+        if not try_config_file.is_absolute():
+            self.config_file = self._work_dir / try_config_file
+        else:
+            self.config_file = try_config_file
+        if self.config_file.exists():
             self._log.debug(f'Using config file: {self.config_file}')
         else:
             self._log.error(f'Config file not found: {config_file}')
+            return False
 
         if not os.path.isdir(self._work_dir):
             try:
