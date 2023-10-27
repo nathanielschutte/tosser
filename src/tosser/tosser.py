@@ -5,7 +5,6 @@ from pathlib import Path
 import logging
 from dotenv import load_dotenv
 import asyncio
-
 from tosser.logs import LOG_MAIN, LOG_DEBUG
 from tosser.exceptions import TosserException
 import tosser.endpoint.source as endpoint_source
@@ -82,7 +81,12 @@ class Tosser:
 
         self.require_source('generate schema')
 
-        schema = TosserSchema()
+        if self.schema is None:
+            assert self.map is not None
+            schema = TosserSchema(path=self.schema_file, map=self.map)
+        else:
+            schema = self.schema
+
         schema.begin()
 
         async def _iter() -> None:
@@ -159,7 +163,8 @@ class Tosser:
 
         if not self.schema_file:
             raise TosserException('Cannot reload schema before setting schema file')
-        self.schema = TosserSchema(path=self.schema_file)
+        assert self.map is not None
+        self.schema = TosserSchema(path=self.schema_file, map=self.map)
         self.schema.load_file()
 
 
@@ -196,19 +201,6 @@ class Tosser:
 
         # TODO make routine for path checks that should be in the workdir
 
-        # Schema config
-        schema_file = resolve_config('TOSS_GENERATED_SCHEMA_FILE', schema_file, TosserSchema.default_file_string())
-        try_schema_file = resolve_path_ref(schema_file, check=False)
-        if not try_schema_file.is_absolute():
-            self.schema_file = self._work_dir / try_schema_file
-        else:
-            self.schema_file = try_schema_file
-        if self.schema_file.exists():
-            self._log.debug(f'Using schema file: {self.schema_file}')
-            self.reload_schema()
-        else:
-            self._log.debug('No existing schema file')
-
         # Map config
         map_file = resolve_config('TOSS_SCHEMA_MAP', map_file, 'map.tosser.json')
         try_map_file = resolve_path_ref(map_file, check=False)
@@ -222,6 +214,19 @@ class Tosser:
         else:
             self._log.error(f'Map file not found: {map_file}')
             return False
+        
+        # Schema config
+        schema_file = resolve_config('TOSS_SCHEMA_FILE', schema_file, TosserSchema.default_file_string())
+        try_schema_file = resolve_path_ref(schema_file, check=False)
+        if not try_schema_file.is_absolute():
+            self.schema_file = self._work_dir / try_schema_file
+        else:
+            self.schema_file = try_schema_file
+        if self.schema_file.exists():
+            self._log.debug(f'Using schema file: {self.schema_file}')
+            self.reload_schema()
+        else:
+            self._log.debug('No existing schema file')
 
         # Ingest config
         config_file = resolve_config('TOSS_CONFIG_FILE', config_file, 'config.tosser.json')

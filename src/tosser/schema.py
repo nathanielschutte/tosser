@@ -8,10 +8,11 @@ import dataclasses
 from tosser.logs import LOG_MAIN
 from tosser.exceptions import TosserSchemaException
 from tosser.object import TosserObject
-from tosser.traverse import Traverser
-from tosser.schema_types import TosserSchemaTypeVar
+from tosser.traverse import Traverser, TrailToken
+from tosser.schema_types import TosserSchemaTypeVar, infer_type
 from tosser.types import TossPathT
 from tosser.util import resolve_path_ref
+from tosser.map import TosserMap
 
 SCHEMA_FILE_EXT = 'toss'
 SCHEMA_DEFAULT_FILE_NAME = 'schema'
@@ -29,9 +30,14 @@ class TosserSchemaColumn:
 class TosserSchema:
     """Tosser schema data structure"""
     
-    def __init__(self, path: Optional[TossPathT] = None) -> None:
+    def __init__(
+            self,
+            map: TosserMap,
+            path: Optional[TossPathT] = None
+        ) -> None:
         self._log = logging.getLogger(LOG_MAIN)
 
+        self.map = map
         self.complete = True
         self.filename = TosserSchema.default_file_string()
         self.path = Path(self.filename)
@@ -64,9 +70,22 @@ class TosserSchema:
         tr = Traverser(rules=None)
         for trail, key, value in tr.traverse(obj):
             assert trail[-1].val == key
+
+            # --- flatten objects case
+            # determine table name
+            table_name = TosserSchema.get_table_name(trail[:-1], self.map.m_flatten_delimeter)
+
+            # determine column name
+
+            # determine type
+
             # print(f'{Traverser.get_trail_string(trail)} = {value}')
         
-        self._log.debug(f'Contributed object [{self._gen_n}] to new schema')
+        file_id_str = ''
+        if obj.metadata is not None and 'file' in obj.metadata:
+            file_id_str = f' from file {obj.metadata["file"]}'
+
+        self._log.debug(f'Contributed object {self._gen_n}{file_id_str} to new schema')
         self._gen_n += 1
         
 
@@ -119,6 +138,13 @@ class TosserSchema:
             for table_name, columns in self.schema.items()
         }
         return json.dumps(data, indent=4)
+
+
+    @staticmethod
+    def get_table_name(trail: List[TrailToken], delim: str) -> str:
+        """Get the table name from a trail"""
+
+        return delim.join([str(t.val) for t in trail])
 
 
     @staticmethod

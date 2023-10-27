@@ -5,6 +5,7 @@ from pathlib import Path
 import logging
 import aiofiles
 import json
+import asyncio
 
 from tosser.endpoint.source import ISource, SourceDriver
 from tosser.object import TosserObject
@@ -29,10 +30,16 @@ class FileSource(ISource):
                 contents = await f.read()
 
             # TODO switch to using a FileParser here
-            parsed = json.loads(contents)
+            data = json.loads(contents)
 
-            self.check_keys(parsed)
-            yield TosserObject(data=parsed['data'], metadata=parsed['metadata'])
+            # self.check_keys(parsed)
+            # metadata = parsed['metadata']
+            filename_key = 'file'
+            # while filename_key in metadata:
+            #     filename_key = f'_{filename_key}'
+            metadata: Dict[str, Any] = {}
+            metadata[filename_key] = file.name
+            yield TosserObject(data={'data': data, 'metadata': metadata}, metadata=metadata)
 
 
     def _expand_file_list(self, path: str) -> List[Path]:

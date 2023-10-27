@@ -1,3 +1,4 @@
+from typing import Optional
 from enum import Enum
 import dataclasses
 
@@ -47,3 +48,7 @@ class TosserSchemaTypeVar:
             type=TosserSchemaType(type_str),
             length=length,
         )
+
+
+def infer_type(value, inference=Optional[TosserSchemaTypeVar]):
+    """Infer the type of a value"""

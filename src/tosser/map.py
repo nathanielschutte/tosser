@@ -71,6 +71,8 @@ class TosserMap:
     m_root_table: str
     m_key_templ: str
     m_tables: Dict[str, MapTable]
+    m_flatten_delimeter: str = '_'
+    m_flatten_objects: bool = True
 
     @staticmethod
     def from_dict(obj: Dict[str, Any]) -> 'TosserMap':
