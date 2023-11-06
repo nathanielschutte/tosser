@@ -13,4 +13,4 @@ unit-tests:
 	pytest -k 'not transactions'
 
 count:
-	@find ./src -type f -name '*.py' -exec wc -l {} +
+	@find ./src -type f -name '*.py' -exec wc -l {} + | sort -n

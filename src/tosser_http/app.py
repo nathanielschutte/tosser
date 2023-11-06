@@ -4,8 +4,8 @@ from flask import Flask, render_template
 from typing import Dict, Any
 import logging
 
-from tosser_browser.api import BrowserApi
-from tosser_browser.logs import LOGGING_CONFIG
+from tosser_http.api import TosserApi
+from tosser_http.logs import LOGGING_CONFIG
 from tosser.logs import LOG_MAIN
 
 HTML_DIR = os.path.abspath(os.path.dirname(__file__)) + '/html'
@@ -17,7 +17,7 @@ logging.config.dictConfig(log_config)
 
 app = Flask(__name__, template_folder=HTML_DIR, static_folder=HTML_DIR)
 logging.getLogger(LOG_MAIN).info(f'Flask server started on port {os.getenv("FLASK_RUN_PORT")}')
-api = BrowserApi()
+api = TosserApi()
 
 @app.route("/")
 def root():

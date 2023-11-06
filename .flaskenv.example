@@ -1,4 +1,4 @@
-FLASK_APP=src/tosser_browser/app
+FLASK_APP=src/tosser_http/app
 FLASK_ENV=development
 FLASK_DEBUG=true
 FLASK_RUN_HOST=localhost

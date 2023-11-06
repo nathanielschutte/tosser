@@ -35,7 +35,7 @@ def _open(
     if os.getenv('FLASK_ENV') is None:
         os.environ['FLASK_ENV'] = 'production' if server_prod else 'development'
 
-    from tosser_browser.app import app as flask_app
+    from tosser_http.app import app as flask_app
 
     if server_prod:
         from waitress import serve

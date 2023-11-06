@@ -73,8 +73,10 @@ class TosserSchema:
 
             # --- flatten objects case
             # determine table name
-            table_name = TosserSchema.get_table_name(trail[:-1], self.map.m_flatten_delimeter)
-
+            if isinstance(value, dict):
+                table_name = TosserSchema.get_table_name(trail[:-1], self.map.m_flatten_delimeter)
+                print(table_name)
+ 
             # determine column name
 
             # determine type
@@ -144,7 +146,10 @@ class TosserSchema:
     def get_table_name(trail: List[TrailToken], delim: str) -> str:
         """Get the table name from a trail"""
 
-        return delim.join([str(t.val) for t in trail])
+        offset = 0
+        if trail[0].val == '$':
+            offset = 1
+        return delim.join([str(t.val) for t in trail[offset:]])
 
 
     @staticmethod
