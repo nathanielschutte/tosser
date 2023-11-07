@@ -9,7 +9,7 @@ from tosser.logs import LOG_MAIN
 from tosser.exceptions import TosserSchemaException
 from tosser.object import TosserObject
 from tosser.traverse import Traverser, TrailToken, TrailTokenType
-from tosser.schema_types import TosserSchemaTypeVar, infer_type, ENUM_ELIGIBLE
+from tosser.schema_types import TosserSchemaTypeVar, TosserSchemaType, infer_type, ENUM_ELIGIBLE
 from tosser.types import TossPathT
 from tosser.util import resolve_path_ref
 from tosser.map import TosserMap
@@ -109,10 +109,10 @@ class TosserSchema:
     def has_table(self, table: TosserSchemaTable) -> bool:
         return any(t == table for t in self.schema.keys())
     
-    def has_column_name(self, table: TosserSchemaTable, column_name: str) -> bool:
+    def has_column_by_name(self, table: TosserSchemaTable, column_name: str) -> bool:
         return any(c.column_name == column_name for c in self.schema[table])
     
-    def get_column(self, table: TosserSchemaTable, column_name: str) -> TosserSchemaColumn:
+    def get_column_by_name(self, table: TosserSchemaTable, column_name: str) -> TosserSchemaColumn:
         return next(c for c in self.schema[table] if c.column_name == column_name)
 
     def begin(self) -> None:
@@ -172,9 +172,9 @@ class TosserSchema:
                 self.schema[table] = []
 
             # new column initializations
-            if not self.has_column_name(next_table, next_column_name):
+            if not self.has_column_by_name(next_table, next_column_name):
                 
-                # infer initial
+                # infer initial type
                 initial_type = infer_type(value)
                 
                 new_column = TosserSchemaColumn(
@@ -187,10 +187,31 @@ class TosserSchema:
                 if initial_type.type in ENUM_ELIGIBLE:
                     new_column.enum = {value}
 
+                # if initial type is max length eligible, add value to initial max length tester
+                if initial_type.type in [TosserSchemaType.STRING]:
+                    new_column.max_length = len(str(value))
+
                 self.schema[next_table].append(new_column)
+
+            # existing column updates
             else:
-                existing_column = self.get_column(next_table, next_column_name)
+                existing_column = self.get_column_by_name(next_table, next_column_name)
+                
+                # update type inference
                 existing_column.type_var = infer_type(value, inference=existing_column.type_var)
+                
+                # update enum
+                if existing_column.enum is not None and len(existing_column.enum) < SCHEMA_ENUM_MAX:
+                        existing_column.enum.add(value)
+
+                # update max length
+                if existing_column.type_var.type in [TosserSchemaType.STRING]:
+                    if existing_column.max_length is not None:
+                        existing_column.max_length = max(existing_column.max_length, len(str(value)))
+                    else:
+                        existing_column.max_length = len(str(value))
+                else:
+                    existing_column.max_length = None
 
             print()
         
@@ -370,6 +391,10 @@ class TosserSchema:
         with open(self.path, 'r') as f:
             data = json.load(f)
 
+        if any(k not in data for k in [TosserSchema.DATA_KEY, TosserSchema.METADATA_KEY]):
+            self._log.info('Schema file is missing required keys, skipping')
+            return
+
         version = None
         if TosserSchema.METADATA_KEY in data:
             metadata = data[TosserSchema.METADATA_KEY]
@@ -383,7 +408,7 @@ class TosserSchema:
                     column_name=column_name,
                     type_var=TosserSchemaTypeVar.from_string(column_data['type']),
                     hint_type_var=TosserSchemaTypeVar.from_string(column_data['hint']) if column_data['hint'] is not None else None,
-                    enum=column_data['enum'],
+                    enum=set(column_data['enum']) if column_data['enum'] is not None else None,
                     max_length=column_data['max_length'],
                 )
                 for column_name, column_data in columns.items()
@@ -408,7 +433,7 @@ class TosserSchema:
                     column.column_name: {
                         'type': str(column.type_var),
                         'hint': str(column.hint_type_var) if column.hint_type_var is not None else None,
-                        'enum': column.enum,
+                        'enum': list(column.enum) if column.enum is not None else None,
                         'max_length': column.max_length,
                     }
                     for column in columns
