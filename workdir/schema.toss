@@ -1,5 +1,5 @@
 {
-    "data": {
+    "__TOSSER_data__": {
         "core": {
             "teachers_siblings": {
                 "type": "string",
@@ -138,8 +138,8 @@
                 "type": "string",
                 "hint": null,
                 "enum": [
-                    null,
-                    "16:41:57.997726"
+                    "16:41:57.997726",
+                    null
                 ],
                 "max_length": 15
             },
@@ -285,8 +285,8 @@
                 "type": "string",
                 "hint": null,
                 "enum": [
-                    "clean",
-                    "pack"
+                    "pack",
+                    "clean"
                 ],
                 "max_length": 5
             }

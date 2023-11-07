@@ -65,7 +65,7 @@ class TosserSchemaTable:
 class TosserSchema:
     """Tosser schema data structure"""
 
-    DATA_KEY = 'data'
+    DATA_KEY = '__TOSSER_data__'
     METADATA_KEY = '__TOSSER_metadata__'
     VERSION = 1
     

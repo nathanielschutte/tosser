@@ -1,5 +1,7 @@
 import typer
 import os
+import json
+import sys
 from typing import Optional
 from typing_extensions import Annotated
 from pathlib import Path
@@ -11,12 +13,28 @@ from tosser.logs import LOGGING_CONFIG
 
 logging.config.dictConfig(LOGGING_CONFIG)
 
-app = typer.Typer()
+app = typer.Typer(
+    pretty_exceptions_short=True,
+    pretty_exceptions_show_locals=False
+)
 tosser = Tosser()
 
 
 @app.command()
-def generate(source: Annotated[str, typer.Option(help='Source endpoint config file or JSON')]):
+def generate(
+        source: Optional[Annotated[str, typer.Option(help='Source endpoint config file or JSON')]] = None,
+        files: Optional[Annotated[str, typer.Option(help='Quick way to set a file glob as the source')]] = None
+    ):
+
+    if files is not None:
+        source = json.dumps({
+            'driver': 'file',
+            'path': files
+        })
+    if source is None:
+        print('Error: source must be set', file=sys.stderr)
+        sys.exit(1)
+
     tosser.set_source(source)
     tosser.generate()
 
