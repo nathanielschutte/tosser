@@ -15,12 +15,16 @@
             "users/*/friends"
         ],
         "Columns": {
-            "@values": "first_name" 
+            "@ignore": "*",
+            "@keep": "first_name" 
         }
     },
     "user_aliases": {
         "Source": [
             "users/aliases"
-        ]
+        ],
+        "Columns": {
+            "@value": "alias"
+        }
     }
 }

@@ -1,20 +1,5 @@
 {
-
-    // Database parameters
-    "Database": {
-        "Connection": {
-            "Host": "localhost",
-            "Port": 3306,
-            "Username": "root",
-            "Password": "root",
-            "Database": "main"
-        },
-
-        // Any subsection can contain an @include directive
-        // to extend the config using additional files. Matches globs.
-        "@include": "database.d/*.json"
-    },
-
+    // Primary mapping config values
     // Defaults for values that may be set within each Table definition
     "Defaults": {
 
@@ -27,16 +12,6 @@
 
         // Default primary key pattern for all Tables
         "Key": "{Table}_id"
-    },
-
-    // Commit insert transactions in batches to reduce network load
-    "Batch": {
-
-        // Queue up this many rows to insert per table
-        "MaxRows": 1000,
-
-        // Commit once the query string reaches this many bytes
-        "MaxBytes": 1073741824 // 1 GB
     },
 
     // Table definitions, including source mappings and name translation
@@ -56,7 +31,7 @@
         ]
     },
 
-    // Include additional main configs
+    // Include additional mapping configs
     "@include": [
         "config.d/*.json"
     ]

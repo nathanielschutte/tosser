@@ -108,4 +108,12 @@ class Traverser:
     def get_trail_string(trail: List[TrailToken]) -> str:
         """Return a string representation of the trail"""
 
-        return '.'.join(map(lambda t: str(t.val), trail))
+        def _token_to_str(token: TrailToken) -> str:
+            if token.type == TrailTokenType.KEY:
+                return str(token.val)
+            elif token.type == TrailTokenType.INDEX:
+                return f'[{str(token.val)}]'
+            else:
+                raise TosserTraverserException(f'Unknown TrailTokenType: {token.type}')
+
+        return '.'.join(map(_token_to_str, trail))

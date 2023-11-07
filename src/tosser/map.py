@@ -13,7 +13,7 @@ METACHAR = '@'
 class Directive(Enum):
     """Column directives for table mappings"""
 
-    VALUES = 'values'
+    VALUES = 'value'
     INCLUDE = 'keep'
     EXCLUDE = 'ignore'
 
@@ -71,7 +71,7 @@ class TosserMap:
     m_root_table: str
     m_key_templ: str
     m_tables: Dict[str, MapTable]
-    m_flatten_delimeter: str = '_'
+    m_table_delimeter: str = '_'
     m_flatten_objects: bool = True
 
     @staticmethod

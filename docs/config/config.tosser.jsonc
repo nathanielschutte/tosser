@@ -1,0 +1,11 @@
+{
+    // Commit insert transactions in batches to reduce network load
+    "Batch": {
+
+        // Queue up this many rows to insert per table
+        "MaxRows": 1000,
+
+        // Commit once the query string reaches this many bytes
+        "MaxBytes": 1073741824 // 1 GB
+    }
+}

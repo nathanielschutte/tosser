@@ -1,0 +1,22 @@
+{
+    "root": {
+        "parent": null,
+        "columns": [
+            {
+                "teachers_siblings": {
+                    "type": "boolean"
+                }
+            }
+        ]
+    },
+    "professors": {
+        "parent": "root",
+        "columns": [
+            {
+                "students": {
+                    "type": "boolean"
+                }
+            }
+        ]
+    }
+}

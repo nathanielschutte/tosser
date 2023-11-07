@@ -18,6 +18,9 @@ class TosserSchemaType(Enum):
     ARRAY = 'array'
     UNKNOWN = 'unknown'
 
+ENUM_ELIGIBLE = [
+    TosserSchemaType.STRING,
+]
 
 @dataclasses.dataclass
 class TosserSchemaTypeVar:
@@ -50,5 +53,9 @@ class TosserSchemaTypeVar:
         )
 
 
-def infer_type(value, inference=Optional[TosserSchemaTypeVar]):
-    """Infer the type of a value"""
+def infer_type(value, inference=Optional[TosserSchemaTypeVar]) -> TosserSchemaTypeVar:
+    """
+    Infer the type of a value
+    Accept optional `inference` argument holding existing inference data
+    """
+    return TosserSchemaTypeVar.from_string('string')

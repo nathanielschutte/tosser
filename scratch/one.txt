@@ -1,0 +1,70 @@
+
+root table name = root
+key = (table)_id
+
+# object flattened
+$.teachers.siblings
+    table name = root
+    table key = root_id
+    parent table = null
+    parent key = null
+    column name = teachers_siblings
+
+# single nested
+$.members.[0].employers
+    table name = members
+    table key = members_id
+    parent table = root
+    parent key = root_id
+    column name = employers
+
+# multiple nested
+$.members.[0].employers.[0].name
+    table name = members_employers
+    table key = members_employers_id
+    parent table = members
+    parent key = members_id
+    column name = name
+
+# multiple nested w intermediate
+$.members.[0].friends.[0].name
+    table name = members_friends
+    table key = members_friends_id
+    parent table = members -> need to create this implicitly
+    parent key = members_id
+    column name = name
+
+# annonymous nested
+$.employees.[0].[0].job
+    table name = employees_0
+    table key = employees_0_id
+    parent table = employees -> need to create this implicitly
+    parent key = employees_id
+    column name = job
+
+# direct value in array
+$.members.[0].todo.[0]
+    table name = members_todo
+    table key = members_todo_id
+    parent table = members
+    parent key = members_id
+    column name = @value (@value directive can set this in config)
+
+schema = data
+    root
+        key = root_id
+    members
+        key = members_id
+        parent_key = root_id
+    members_employers
+        key = members_employers_id
+        parent_key = members_id
+    members_friends
+        key = members_friends_id
+        parent_key = members_id
+    employees
+        key = employees_id
+        parent_key = root_id
+    employees_0
+        key = employees_0_id
+        parent_key = employees_id

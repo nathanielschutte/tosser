@@ -3,7 +3,8 @@
         "Schema": "data",
         "RootTable": "root",
         "Key": "{table}_id",
-        "FlattenDelimeter": "_",
-        "FlattenObjects": true
+        "TableDelimeter": "_",
+        "FlattenObjects": true,
+        "PrependRootTableName": false
     }
 }
