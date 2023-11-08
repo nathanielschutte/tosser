@@ -7,6 +7,7 @@ from typing_extensions import Annotated
 from pathlib import Path
 from dotenv import load_dotenv
 import logging
+import asyncio
 
 from tosser import Tosser
 from tosser.logs import LOGGING_CONFIG
@@ -17,13 +18,12 @@ app = typer.Typer(
     pretty_exceptions_short=True,
     pretty_exceptions_show_locals=False
 )
-tosser = Tosser()
 
 
 @app.command()
 def generate(
-        source: Optional[Annotated[str, typer.Option(help='Source endpoint config file or JSON')]] = None,
-        files: Optional[Annotated[str, typer.Option(help='Quick way to set a file glob as the source')]] = None
+        source: Annotated[Optional[str], typer.Option(help='Source endpoint config file or JSON')] = None,
+        files: Annotated[Optional[str], typer.Option(help='Quick way to set a file glob as the source')] = None
     ):
 
     if files is not None:
@@ -35,8 +35,9 @@ def generate(
         print('Error: source must be set', file=sys.stderr)
         sys.exit(1)
 
+    tosser = Tosser()
     tosser.set_source(source)
-    tosser.generate()
+    asyncio.run(tosser.generate())
 
 
 @app.command(name='open')
@@ -65,7 +66,8 @@ def _open(
 
 @app.command(name='in')
 def _in():
-    ...
+    ts = Tosser()
+    asyncio.run(ts.ingest())
 
 
 def main():

@@ -5,10 +5,13 @@ from pathlib import Path
 import logging
 from dotenv import load_dotenv
 import asyncio
+import concurrent.futures
+from functools import partial
+import time
 from tosser.logs import LOG_MAIN, LOG_DEBUG
 from tosser.exceptions import TosserException
 import tosser.endpoint.source as endpoint_source
-import tosser.endpoint.target as endpoint_target 
+import tosser.endpoint.target as endpoint_target
 from tosser.schema import TosserSchema
 from tosser.map import TosserMap
 from tosser.types import TossPathT
@@ -32,17 +35,13 @@ class Tosser:
         
         self.is_setup = False
 
-        # Keeping the async loop in the main thread within context object
-        # Going to spawn thread pool to handle async compute tasks
-        self.loop = asyncio.get_event_loop()
-
         # Context
         self.schema_file: Path
         self.map_file: Path
         self.config_file: Path
         self.schema: Optional[TosserSchema] = None
         self.map: Optional[TosserMap] = None
-        self.config: Optional[Dict[str, Any]] = None
+        self.config: Dict[str, Any] = {}
 
         # Workspace setup
         self._work_dir: Path = Path('.')
@@ -70,13 +69,32 @@ class Tosser:
 
     # API
     @_with_schema
-    def ingest(self):
+    async def ingest(self):
         """Ingest objects"""
 
-        print()
-        
+        max_workers = self.config.get('max_threads', 10)
 
-    def generate(self) -> None:
+        # use the loop this coroutine was called in
+        loop = asyncio.get_running_loop()
+
+        # example of how cpu bound work will be executed within the event loop
+        def _work(id):
+            self._log.debug(f'POOL THREAD {id} running')
+            time.sleep(1)
+            return id
+
+        # choose thread pool for memory intensive compute, so we dont have to IPC transfer huge objects
+        # threads suffer in performance due to the GIL however
+        with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as pool:
+            futures = []
+            for id in range(0, 20):
+                futures.append(loop.run_in_executor(pool, partial(_work, id)))
+        
+        results = await asyncio.gather(*futures)
+        print(results)
+
+        
+    async def generate(self) -> None:
         """Generate schema using source objects"""
 
         self.require_source('generate schema')
@@ -93,7 +111,7 @@ class Tosser:
             async for obj in self.source.iter_objects():
                 schema.contribute(obj)
 
-        self.loop.run_until_complete(_iter())
+        await _iter()
         schema.end()
         schema.write_file(self._work_dir)
         
@@ -160,7 +178,8 @@ class Tosser:
 
     def reload_schema(self) -> None:
         """Recreates the TosserSchema object using the configured schema_file"""
-
+        
+        # print('RELOAD SCHEMA')
         if not self.schema_file:
             raise TosserException('Cannot reload schema before setting schema file')
         assert self.map is not None
@@ -224,7 +243,7 @@ class Tosser:
             self.schema_file = try_schema_file
         if self.schema_file.exists():
             self._log.debug(f'Using schema file: {self.schema_file}')
-            self.reload_schema()
+            # self.reload_schema()
         else:
             self._log.debug('No existing schema file')
 
