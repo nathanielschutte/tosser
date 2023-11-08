@@ -138,8 +138,8 @@
                 "type": "string",
                 "hint": null,
                 "enum": [
-                    "16:41:57.997726",
-                    null
+                    null,
+                    "16:41:57.997726"
                 ],
                 "max_length": 15
             },
