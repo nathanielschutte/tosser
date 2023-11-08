@@ -26,9 +26,9 @@ requires-python = ">=3.9"
 toss = "tosser_cli:main"
 
 [tool.pytest.ini_options]
-addopts = "--cov=tosser"
+#addopts = "--cov=tosser"
 testpaths = [
-    "tests",
+    "test",
 ]
 
 [tool.mypy]
